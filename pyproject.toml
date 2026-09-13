@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "svf-reproducer"
 version = "0.1.0"
-description = "Versioned reconstruction, validation, and execution control for SVF FormData XML"
+description = "Local AI-assisted conversion of report images and PDFs into editable SVF FormData XML"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []

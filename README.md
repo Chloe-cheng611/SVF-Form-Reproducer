@@ -1,49 +1,77 @@
 # SVF Form Reproducer
 
-SVF FormData XMLを安全に再構築し、差分検証・世代管理・実行証跡まで一貫して扱うPythonツールです。
+帳票の画像・PDFを解析し、SVF Designerで編集可能なFormData XMLへ変換する、機密環境向けのローカルAI帳票生成ツールです。
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/tests-79%20passed-2E7D32)](#テスト)
 [![Status](https://img.shields.io/badge/status-pre--release-E67E22)](#現在の対応状況)
 
 > [!IMPORTANT]
-> ローカル回帰試験は完了していますが、対象SVF・Designer・Windows実機での受入は未実施です。本番利用前に、対象製品・版・SP・フォント・出力経路を登録し、実機受入を行ってください。
+> 本リポジトリはPoC段階です。画像・PDFの解析、帳票候補の抽出、ベースXMLを使った生成・検証は実装しています。候補から新規SVF XMLまでを一括実行する経路と、対象SVF・Designer・Windows実機での受入は未完了です。
 
-## 概要
+## このプロジェクトを作った理由
 
-SVF帳票では、見た目が近いだけでは十分ではありません。Field名、式、キー、RecordとSubFormの関係、文字コード、座標DPIなど、既存XMLに含まれる契約を維持する必要があります。
+客先現場では、完成済みのPDFや画像を見ながら、罫線、文字、入力項目をSVF Designerで一つずつ作り直す作業が発生していました。帳票一式の作成に約1か月かかり、修正のたびに再調整も必要でした。
 
-SVF Form Reproducerは元のFormData XMLを正本として保持し、許可された変更だけを適用します。変更候補は対象IDと備考に結び付け、検査済みのXMLだけを不変の世代として保存します。
+現場は、長年使われてきた基幹システムと既存資産を大切にし、情報管理にも厳格です。帳票には顧客情報や取引情報が含まれるため、PDFや画像を外部の生成AIへ送る方法は採用できませんでした。
 
-画像・PDFからの抽出、few-shotを参照したLLM提案、参考SVG、業務CSVの実行、Designer・runtimeの受入証拠を同じ処理モデルで管理します。
+そこで私は、実務で感じた課題を起点に、情報を社外へ出さずに帳票作成を支援する社内DX向けAIプロダクトを企画しました。課題定義、要件整理、設計、実装、テスト、ドキュメント整備まで一貫して担当しています。
 
-## 解決する課題
+客先現場での自主検証では、従来約1か月を要していた帳票作成工程を約1週間まで短縮しました。これは開発者本人による試験結果であり、責任者または客先による正式評価ではありません。
 
-- 1属性の修正で、XML全体の改行・宣言・未知属性を壊さない
-- 位置由来IDの変化による誤対象編集を防ぐ
-- 表示行数Dと業務データ件数Nを独立して扱う
-- CSVを含む実行入力を固定し、古い成功結果の再利用を防ぐ
-- 結果不明の外部実行を自動再送せず、重複出力を防ぐ
-- 検証対象と証拠のハッシュを結び付け、根拠のないpassを防ぐ
+## 対象となる課題
+
+[SVF公式サイト](https://www.wingarc.com/product/svf/index.html)では、2026年2月末時点の導入実績が42,000社以上、国内シェアが70%と紹介されています。また、[外部システム連携の説明](https://www.wingarc.com/product/svf/collaboration/)では、基幹システム刷新やクラウド移行で帳票が課題になりやすいとされています。
+
+長く使われる基幹・業務システムでは、帳票の見本だけが残り、編集可能な設計データが不足している場合があります。人手による作り直しは時間がかかり、担当者の経験に品質が左右されます。
+
+## プロダクト概要
+
+SVF Form Reproducerは、帳票の画像やPDFから文字、配置、明細構造を読み取り、SVFの部品候補へ変換します。ローカルAIがfew-shotの記法例を参照してXML案を作り、利用者は対象を選んで自然文の備考で修正できます。
+
+AIの出力はそのまま採用しません。Pythonが構造、対象範囲、座標、対象SVF版との整合を検査し、SVF Designerで編集できるFormData XMLと参考表示を生成します。既存XMLは、新規生成時のベースや追加修正の入力として任意に利用します。
+
+## 提供する価値
+
+- 帳票を目視で写し直す反復作業を減らす
+- 画像の貼り付けではなく、後から編集・再利用できるSVF XMLを作る
+- 外部AIへ帳票を送れない環境でも、ローカル処理を選択できる
+- AIが迷う箇所を利用者へ返し、備考による修正を次の生成へ反映する
+- 明細件数を固定せず、SubFormとRecordの設定に従う汎用帳票を作る
+- 生成、確認、修正、再生成を一つの作業履歴として残す
 
 ## 主な機能
 
 | 領域 | 機能 |
 |---|---|
-| XML取込 | UTF-8、UTF-16、Shift_JIS系の厳密な読込、DTD・実体拒否、IR生成 |
-| 安全な編集 | バッチ中のID固定、許可属性の局所置換、対象外バイトと意味差分の検査 |
-| 備考とLLM | 対象選択、備考の追加・修正・取消、古い応答と対象範囲外変更の拒否 |
-| 明細設計 | SubForm・Record・表示行数Dを保持し、件数Nと分離して参考表示 |
 | 原稿解析 | PDF・画像の文字／領域抽出、OCR接続、明細候補の未確定管理 |
+| 帳票構造化 | 固定文字、入力項目、画像、SubForm、Recordなどの部品候補を整理 |
+| ローカルAI | few-shotの記法例と利用者の備考から、対象を限定したXML案を作成 |
+| XML生成 | 対象版のベースXMLへ検査済みの部品・設定を反映し、編集可能な様式を生成 |
+| 修正操作 | 対象選択、備考の追加・修正・取消、古いAI応答の拒否 |
+| 明細設計 | SubForm・Record・表示行数Dを保持し、実データ件数Nと分離 |
+| 既存資産の利用 | 既存XMLを入力した場合、未知属性や既存設定を保護して必要箇所だけ変更 |
 | 世代保存 | 原本・生成物・profile・検証記録を不変世代として保存し、currentを安全に更新 |
 | runtime | XML・CSV・mapping・profileを固定し、入力同一性、単一実行、UNKNOWNを管理 |
 | 受入記録 | 構造、参考表示、runtime、Designerの結果と証拠を対象世代へ結合 |
 
-## 設計原則
+## プロダクト設計の判断
 
-### 元XMLを正本にする
+### 機密情報を外へ出さない
 
-未知ノードや既存属性を作り直しません。属性変更は開始タグ内を局所置換し、対象外バイトの一致と再解析を確認します。構造変更は許可した意味差分だけを受理します。
+OCRとLLMはローカル実行を前提とし、外部サービスへの自動切替を行いません。導入先が許可した実行コマンドだけをprofileへ登録します。
+
+### AIに最終判断を任せない
+
+AIは帳票部品とXMLの候補を作ります。対象範囲、構造、値の妥当性はPythonで検査し、曖昧な箇所は利用者へ戻します。自動化と人の判断を分けることで、現場で修正できる設計にしています。
+
+### 編集できる成果物を作る
+
+帳票全体を背景画像として貼り付けるのではなく、文字、Field、罫線、Recordなどの部品へ分解します。生成後もSVF Designerで調整し、業務データと接続できることを目標にしています。
+
+### 既存XMLを使う場合は壊さない
+
+既存XMLをベースや修正対象として読み込んだ場合は、未知ノードや既存属性を作り直しません。変更箇所を限定し、対象外のバイト列と意味差分を検査します。
 
 ### profileにない値を推測しない
 
@@ -61,20 +89,20 @@ SVF版、SP、実行OS、座標DPI、enum、フォント、素材、実行コマ
 
 ```mermaid
 flowchart LR
-    A[元XML・PDF・画像] --> B[取込とIR生成]
-    B --> C[対象選択と備考]
-    C --> D[決定的解釈またはLLM提案]
-    D --> E[型・範囲・構造・保全検査]
-    E -->|合格| F[候補XMLと参考SVG]
-    E -->|不合格| C
-    F --> G[不変世代へ保存]
-    G --> H[Designer確認]
-    G --> I[SVF runtime]
-    H --> J[受入証拠]
-    I --> J
+    A[帳票画像・PDF] --> B[文字・配置・明細を解析]
+    B --> C[SVF部品候補を作成]
+    C --> D[ローカルAIがXML案を作成]
+    E[few-shotの記法例] --> D
+    F[対象選択と備考] --> D
+    D --> G[Pythonが構造と変更範囲を検査]
+    G -->|要修正| F
+    H[対象版ベースXML・既存XML] --> G
+    G -->|合格| I[SVF FormData XMLと参考表示]
+    I --> J[SVF Designerで編集・確認]
+    J --> K[SVFで帳票出力]
 ```
 
-確定済み帳票への日常出力では、OCRやLLMを再実行しません。受入済み世代とJobを照合し、固定したCSVをSVFへ渡します。実際の改ページとRecord展開はSVFへ委ねます。
+一度確定した帳票を日常運用で出力するときは、OCRやLLMを再実行しません。確定XMLへ業務データを渡し、SVF本来のRecord展開と改ページを利用します。
 
 ## 必要環境
 
@@ -122,22 +150,41 @@ runtimeも使う場合は実行コマンドまで検査します。
 svf-reproducer profile-validate config/profile.local.json --runtime
 ```
 
-### 2 XMLを取り込み、変更対象を確認する
+### 2 画像またはPDFを解析する
+
+文字層を持つPDFは文字と配置を抽出します。画像やスキャンPDFでは、profileに登録したローカルOCRを呼び出します。
 
 ```bash
-svf-reproducer import input.xml config/profile.local.json work --revision base
-svf-reproducer targets input.xml config/profile.local.json --kind Record
+svf-reproducer extract source.pdf config/profile.local.json source.json
+svf-reproducer candidates source.json candidates.json
+```
+
+画像の物理サイズを確定する場合はDPIを指定します。
+
+```bash
+svf-reproducer extract source.png config/profile.local.json source.json --dpi 300
+```
+
+`source.json`には認識した文字と位置、`candidates.json`には固定項目や明細の候補が保存されます。曖昧な結果は自動確定せず、Issueとして残します。
+
+現行の公開版では、候補から新規SVF XMLまでを一括適用するCLI経路は未接続です。以下は、対象版のベースXMLを使って生成・検証機構を確認する手順です。
+
+### 3 対象版のベースXMLを取り込む
+
+```bash
+svf-reproducer import base.xml config/profile.local.json work --revision base
+svf-reproducer targets base.xml config/profile.local.json --kind Record
 ```
 
 `source_hash`と`target_id`は、取込後の`work/revisions/base/ir.json`または`targets`の結果から取得します。
 
-### 3 備考から変更案を作る
+### 4 備考から変更案を作る
 
 ```bash
 svf-reproducer annotation-add notes.json SOURCE_HASH \
   "表示行数を10行から12行に変更" TARGET_ID
 
-svf-reproducer resolve input.xml config/profile.local.json notes.json \
+svf-reproducer resolve base.xml config/profile.local.json notes.json \
   --output changes.json
 ```
 
@@ -148,14 +195,14 @@ LLMを使う場合は、profileに`proposal_command`を登録します。few-sho
 ```bash
 svf-reproducer fewshot-index few-shot.txt config/fewshot-index.json
 
-svf-reproducer propose input.xml config/profile.local.json notes.json proposal.json \
+svf-reproducer propose base.xml config/profile.local.json notes.json proposal.json \
   --fewshot-index config/fewshot-index.json
 ```
 
-### 4 検査済みXMLを生成する
+### 5 検査済みXMLを生成する
 
 ```bash
-svf-reproducer generate input.xml config/profile.local.json changes.json \
+svf-reproducer generate base.xml config/profile.local.json changes.json \
   generated.xml --workspace work --revision r002
 
 svf-reproducer render-test generated.xml config/profile.local.json design.svg
@@ -232,10 +279,12 @@ svf-reproducer comparison-plan comparison-plan.json --capacity 20
 
 | 項目 | 状態 |
 |---|---|
-| XML編集・構造検査・世代保存 | ローカル回帰試験済み |
+| 客先現場での工程短縮 | 約1か月から約1週間へ短縮した自主検証実績。正式評価は未実施 |
+| PDF・画像解析と候補抽出 | 実装済み。実原稿を使った精度測定は未実施 |
+| 候補から新規XMLまでの一括生成 | CLI／GUIへの接続が未完了 |
+| ベースXMLへの生成・構造検査・世代保存 | ローカル回帰試験済み |
 | 備考・LLM提案・CLI／GUIの処理接続 | 統合試験済み。実LLMは未確認 |
 | CSV実行・重複防止・証拠管理 | 模擬runtimeで異常系確認済み |
-| PDF・画像・OCR | 実装済み。実原稿での精度測定は未実施 |
 | Windows | ロック経路の代替試験済み。実機未確認 |
 | Designer・実SVF | 未受入 |
 | 罫線抽出、複数Recordの容量算定、固有表現 | 一部未対応 |
