@@ -1,0 +1,53 @@
+{
+  "profile_id": "fewshot-reference-smoke-only",
+  "product": "SVF FormData syntax sample",
+  "version": "sample metadata 9.2",
+  "service_pack": null,
+  "output_device": "no-runtime-smoke-test",
+  "host_os": "test-os",
+  "fonts": [],
+  "coordinate_dpi": 400,
+  "output_device_dpi": null,
+  "base_xml": "../few-shot.txt",
+  "runtime_kind": "none",
+  "runtime_command": [],
+  "runtime_timeout_seconds": 300,
+  "runtime_artifact_globs": [
+    "*.pdf"
+  ],
+  "ocr_command": [],
+  "pdf_render_command": [],
+  "ocr_timeout_seconds": 120,
+  "ocr_max_log_bytes": 1000000,
+  "proposal_command": [],
+  "proposal_timeout_seconds": 120,
+  "supports_empty_form": false,
+  "supports_embedded_newlines": false,
+  "compatibility": {
+    "Record": "edit_supported",
+    "Field": "preserve_only",
+    "SubForm": "preserve_only"
+  },
+  "editable_attributes": {
+    "Record": [
+      "displayLineCount"
+    ]
+  },
+  "element_templates": {},
+  "allow_reparent": false,
+  "enum_maps": {
+    "subform.direction": {
+      "1": "vertical"
+    },
+    "record.heightUnit": {},
+    "record.type": {}
+  },
+  "record_group": [],
+  "assets": {},
+  "supported_formdata_versions": [
+    "9.2"
+  ],
+  "source_notes": [
+    "自動試験専用。few-shotの値を導入先SVFの互換性根拠に使用しない。"
+  ]
+}

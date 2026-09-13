@@ -1,0 +1,53 @@
+{
+  "profile_id": "target-environment",
+  "product": null,
+  "version": null,
+  "service_pack": null,
+  "output_device": null,
+  "host_os": null,
+  "fonts": [],
+  "coordinate_dpi": null,
+  "output_device_dpi": null,
+  "base_xml": null,
+  "runtime_kind": "none",
+  "runtime_command": [],
+  "runtime_timeout_seconds": 300,
+  "runtime_artifact_globs": [
+    "*.pdf"
+  ],
+  "ocr_command": [],
+  "pdf_render_command": [],
+  "ocr_timeout_seconds": 120,
+  "ocr_max_log_bytes": 1000000,
+  "proposal_command": [],
+  "proposal_timeout_seconds": 120,
+  "supports_empty_form": false,
+  "supports_embedded_newlines": false,
+  "compatibility": {
+    "Field": "preserve_only",
+    "Record": "preserve_only",
+    "SubForm": "preserve_only"
+  },
+  "editable_attributes": {
+    "Record": [
+      "displayLineCount"
+    ],
+    "Field": [],
+    "Text": []
+  },
+  "element_templates": {},
+  "allow_reparent": false,
+  "enum_maps": {
+    "record.heightUnit": {},
+    "subform.direction": {},
+    "record.type": {}
+  },
+  "record_group": [],
+  "assets": {},
+  "supported_formdata_versions": [],
+  "source_notes": [
+    "導入先で保存したXMLと実行手順から実値を登録する。few-shotの数値enumを転記しない。",
+    "host_osはツールを実行するOS。coordinate_dpiは元XMLのPaper/@resolutionと一致させる。",
+    "record.heightUnitとsubform.directionは対象版で確認した対応表だけを登録する。未登録なら行送りと容量を未確定として扱う。"
+  ]
+}

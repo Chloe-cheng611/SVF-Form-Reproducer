@@ -1,0 +1,10 @@
+{
+  "job_id": "example-001",
+  "form_revision": "replace-with-revision",
+  "mapping_hash": "replace-with-mapping-hash",
+  "header": {},
+  "data_file": "detail.csv",
+  "data_count": 0,
+  "output_profile": "target-environment",
+  "empty_policy": "skip"
+}

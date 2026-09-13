@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+*.log
+*.tmp
+work/
+output/
+config/profile.local.json
+config/mapping.local.json
+job.local.json

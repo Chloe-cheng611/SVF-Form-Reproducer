@@ -1,0 +1,12 @@
+{
+  "changes": [
+    {
+      "target_id": "svf:Record:Record1:54654c09f9",
+      "op": "set",
+      "property": "displayLineCount",
+      "value": 3,
+      "note_ids": [],
+      "example_ids": ["example-013"]
+    }
+  ]
+}

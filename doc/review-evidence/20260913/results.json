@@ -1,0 +1,204 @@
+[
+  {
+    "case": "R01",
+    "observed": {
+      "initial": [
+        10,
+        20,
+        30
+      ],
+      "requested": "original 20 -> 555",
+      "actual": [
+        "20",
+        "555",
+        "40"
+      ]
+    }
+  },
+  {
+    "case": "R02",
+    "observed": {
+      "simulation": "fcntl unavailable, not native Windows",
+      "returncode": 1,
+      "last_error": "ModuleNotFoundError: import of fcntl halted; None in sys.modules"
+    }
+  },
+  {
+    "case": "R03",
+    "observed": {
+      "exception": "ValueError",
+      "message": "multi-byte encodings are not supported"
+    }
+  },
+  {
+    "case": "R04",
+    "observed": {
+      "before_crlf": 60,
+      "after_crlf": 0,
+      "before_declaration": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+      "after_declaration": "<?xml version='1.0' encoding='utf-8'?>",
+      "before_final_lf": true,
+      "after_final_lf": false
+    }
+  },
+  {
+    "case": "R05",
+    "observed": {
+      "400_x_mm": 7.62,
+      "600_x_mm": 5.08,
+      "error_codes": []
+    }
+  },
+  {
+    "case": "R06",
+    "observed": {
+      "xml_changed": true,
+      "accepted_designer": true
+    }
+  },
+  {
+    "case": "R07",
+    "observed": {
+      "accepted_runtime_without_artifacts": true
+    }
+  },
+  {
+    "case": "R08",
+    "observed": {
+      "hash_unchanged": true,
+      "cached_result": {
+        "status": "SUCCEEDED",
+        "runtime_job_id": "old-A-result",
+        "data_count": 1,
+        "artifact_paths": [],
+        "log_paths": [],
+        "error_code": null,
+        "issues": []
+      }
+    }
+  },
+  {
+    "case": "R09",
+    "observed": {
+      "result": {
+        "exception": "TypeError",
+        "message": "can't concat str to bytes"
+      },
+      "ledger": {
+        "jobs": {
+          "timeout": {
+            "input_hash": "e4c03407692e91900523599d626f087a8fecbc1e1ad0774e1be55e5b50f4ef96",
+            "state": "RUNNING"
+          }
+        },
+        "schema": "svf-runtime-ledger/1.0"
+      }
+    }
+  },
+  {
+    "case": "R10",
+    "observed": {
+      "structural_status": "fail",
+      "old_output_replaced": true,
+      "current_revision": "bad-generation"
+    }
+  },
+  {
+    "case": "R11",
+    "observed": {
+      "original_overwritten": true,
+      "saved_source_equals_generated": true
+    }
+  },
+  {
+    "case": "R12",
+    "observed": {
+      "wrong-root": [],
+      "nan": [],
+      "link-cycle": []
+    }
+  },
+  {
+    "case": "R13",
+    "observed": {
+      "10.7": "10.7",
+      "True": "True",
+      "profile": "TypeError: '<=' not supported between instances of 'str' and 'int'"
+    }
+  },
+  {
+    "case": "R14",
+    "observed": {
+      "internal_entity_result": "EXPANDED"
+    }
+  },
+  {
+    "case": "R15",
+    "observed": [
+      {
+        "target_id": "record",
+        "op": "set",
+        "property": "displayLineCount",
+        "value": 10,
+        "note_ids": [
+          "6768f846-0632-4187-bdb7-493f0f87ca9e"
+        ],
+        "example_ids": []
+      }
+    ]
+  },
+  {
+    "case": "R16",
+    "observed": {
+      "rows": [
+        {
+          "code": "A",
+          "required": null
+        }
+      ],
+      "errors": []
+    }
+  },
+  {
+    "case": "R17",
+    "observed": {
+      "zero_data_record_instances": 1,
+      "D4_record_instances": 4,
+      "D4_child_text_instances": 1,
+      "field_rendered": false
+    }
+  },
+  {
+    "case": "R18",
+    "observed": {
+      "note_target": "R1",
+      "modified_R2": "8"
+    }
+  },
+  {
+    "case": "R19",
+    "observed": {
+      "status": "SUCCEEDED",
+      "artifact_sizes": [
+        0
+      ]
+    }
+  },
+  {
+    "case": "R20",
+    "observed": {
+      "first_claim": null,
+      "second_claim": null,
+      "states": {
+        "a": {
+          "input_hash": "hash-a",
+          "state": "RUNNING"
+        },
+        "b": {
+          "input_hash": "hash-b",
+          "state": "RUNNING"
+        }
+      }
+    }
+  }
+]

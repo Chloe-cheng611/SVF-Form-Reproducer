@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "svf-reproducer"
+version = "0.1.0"
+description = "Versioned reconstruction, validation, and execution control for SVF FormData XML"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+# 抽出経路の依存は上限を固定する。導入先で実PDF・実画像を確認した版の組合せを
+# ここへ追記する。現時点で検証済みと記録できる組合せはない。
+extract = ["pypdf>=5,<6", "Pillow>=11,<12"]
+
+[project.scripts]
+svf-reproducer = "svf_reproducer.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
